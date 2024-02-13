@@ -1,7 +1,7 @@
 import {
+  BadRequestException,
   Body,
   Controller,
-  Get,
   Headers,
   Post,
   UsePipes,
@@ -30,8 +30,12 @@ export class AuthenticationController {
     return await this.authenticationService.generateToken(credentials);
   }
 
-  @Get('checkAuth')
-  async checkAuth(@Headers() headers): Promise<TokenResponseDto> {
-    return await this.authenticationService.checkToken(headers.Authorization);
+  @Post('checkAuth')
+  async checkAuth(
+    @Headers() headers: { authorization: string },
+  ): Promise<TokenResponseDto> {
+    if (!headers?.authorization)
+      throw new BadRequestException('token must be supplied');
+    return await this.authenticationService.checkToken(headers.authorization);
   }
 }
